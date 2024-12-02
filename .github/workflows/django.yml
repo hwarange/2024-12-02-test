@@ -1,0 +1,35 @@
+name: Django CI   # 이 스크립트가 무엇을 할지 나타내줌
+
+on:              
+  push:           # main으로 push, pull_request가 될 때 아래 jobs가 동작
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest                # 깃허브는 우분투 최신버전으로 돌려줌
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v4          
+    - name: Set up Python                                # 파이썬 버전 선택란
+      uses: actions/setup-python@v3                      
+      with:
+        python-version: "3.10"                        # 3.10을 쓰고 있었으니 3.10으로 작성 
+    - name: Install Dependencies                         # pip업그레이드 이후 requirements 실행
+      run: |  
+        python -m pip install --upgrade pip             
+        pip install -r requirements.txt
+    # - name: Run Tests                          # 지금 장고를 쓰지 않기 때문에 일단 주석처리
+    #   run: |
+    #     python manage.py test
+
+    - name: Run Tests  by unittest
+      run: |
+        python -m unittest discover -s tests
+        
